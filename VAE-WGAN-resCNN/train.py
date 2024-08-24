@@ -16,7 +16,7 @@ from torch.cuda import empty_cache
 from dataloader import CustomImageDataset
 from utils import show_and_save,plot_loss,TopHalfCrop
 
-from models1 import VAE_GAN,Discriminator
+from models0 import VAE_GAN,Discriminator
 # nvidia-smi -l 0.2
 
 
@@ -26,12 +26,12 @@ if __name__=='__main__':
     # 数据集路径
     root_dir = './data1'
     # 创建保存模型的文件夹
-    models_dir = './models1'
+    models_dir = './models4'
     if not os.path.exists(models_dir):
         os.makedirs(models_dir)
 
     # 创建保存生成图片的文件夹
-    image_dir = './image_mod1'
+    image_dir = './image_mod4'
     if not os.path.exists(image_dir):
         os.makedirs(image_dir)
 
@@ -235,7 +235,7 @@ if __name__=='__main__':
     }, vae_gan_final_path)
 
     # 绘制损失曲线
-    plot_loss(prior_loss_list, 'models1_prior_loss0.png')  # 先验损失误差
-    plot_loss(recon_loss_list, 'models1_recon_loss0.png')  # 重建损失误差
-    plot_loss(gan_loss_list, 'models1_gan_loss0.png')   # GAN损失误差
+    plot_loss(prior_loss_list, 'models0_prior_loss0.png')  # 先验损失误差
+    plot_loss(recon_loss_list, 'models0_recon_loss0.png')  # 重建损失误差
+    plot_loss(gan_loss_list, 'models0_gan_loss0.png')   # GAN损失误差
 

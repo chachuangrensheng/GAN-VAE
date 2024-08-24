@@ -17,8 +17,10 @@ import pandas as pd
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 torch.autograd.set_detect_anomaly(True)
 from dataloader import CustomImageDataset
-from models import VAE_GAN, Discriminator
 from utils import show_and_save, plot_loss, TopHalfCrop
+
+from models0 import VAE_GAN, Discriminator
+
 
 if __name__ == '__main__':
     # 批次大小

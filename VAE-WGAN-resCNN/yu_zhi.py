@@ -12,8 +12,10 @@ torch.autograd.set_detect_anomaly(True)
 import os
 from sklearn.decomposition import PCA
 from dataloader import CustomImageDataset
-from models import VAE_GAN,Discriminator
 from utils import show_and_save,plot_loss,TopHalfCrop
+
+from models0 import VAE_GAN,Discriminator
+
 
 if __name__=='__main__':
     # 批次大小
