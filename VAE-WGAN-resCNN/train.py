@@ -150,11 +150,11 @@ if __name__=='__main__':
             err_dec = gamma * rec_loss - gan_loss
             # 将重构损失添加到列表中，用于后续统计或输出
             recon_loss_list.append(rec_loss.item())
-            # # 清空优化器的梯度信息
+            # # 清空编码器的优化器的梯度信息
             optim_D.zero_grad()
             # 反向传播计算梯度，保留计算图以便后续计算
             err_dec.backward(retain_graph=True)
-            # 更新鉴别器的参数
+            # 更新编码器的参数
             optim_D.step()
             empty_cache()
             # 通过生成模型计算给定数据的均值、对数方差和编码重构值
