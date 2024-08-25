@@ -14,7 +14,7 @@ from sklearn.decomposition import PCA
 from dataloader import CustomImageDataset
 from utils import show_and_save,plot_loss,TopHalfCrop
 
-from models0 import VAE_GAN,Discriminator
+from models4 import VAE_GAN,Discriminator
 
 
 if __name__=='__main__':
@@ -23,7 +23,7 @@ if __name__=='__main__':
     # 数据集路径
     root_dir = './data1'
     # 模型保存的文件夹
-    models_dir = 'models0'
+    models_dir = 'models4'
     # 定义gamma参数，用于模型中的折扣因子或加权系数
     gamma=15
     # 阈值调整系数

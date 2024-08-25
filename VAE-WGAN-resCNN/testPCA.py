@@ -13,22 +13,24 @@ import time
 from sklearn.decomposition import PCA
 import seaborn as sns
 import pandas as pd
-
+from torch.cuda import empty_cache
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 torch.autograd.set_detect_anomaly(True)
 from dataloader import CustomImageDataset
 from utils import show_and_save, plot_loss, TopHalfCrop
 
-from models0 import VAE_GAN, Discriminator
+from models4 import VAE_GAN, Discriminator
 
 
 if __name__ == '__main__':
     # 批次大小
-    batch_size = 603
+    batch_size = 201
+    # 每包数据大小
+    pack_size = 603
     # 数据集路径
     root_dir = './data1'
     # 模型保存的文件夹
-    models_dir = 'models0'
+    models_dir = 'models4'
     # 定义gamma参数，用于模型中的折扣因子或加权系数
     gamma = 15
 
@@ -105,7 +107,7 @@ if __name__ == '__main__':
     # 使用make_grid函数将特定输出转换为网格形式，并保存为图片
     show_and_save(f'test_noise', make_grid((c * 0.5 + 0.5).cpu(), 1))
     show_and_save(f'test', make_grid((b * 0.5 + 0.5).cpu(), 1))
-
+    # empty_cache()
     # 重构损失列表
     recon_loss_list = []
     # 预测标签
@@ -132,48 +134,39 @@ if __name__ == '__main__':
             x_l = discrim(datav)[1]
             # 计算重构损失，即隐藏特征的平方差的均值
             rec_loss = ((x_l_tilda - x_l) ** 2)
-            # # 计算解码器的错误，结合重构损失和生成对抗损失
-            # err_dec = gamma * rec_loss - gan_loss
-            # 将重构损失添加到列表中，用于后续统计或输出
-            # recon_loss_list.append(rec_loss.mean().item())
             recon_loss_list.extend(rec_loss.cpu().numpy())
 
-            # Calculate the anomaly score
-            # Apply PCA to reduce the dimensionality
-            pca = PCA(n_components=1)
-            recon_loss_list = pca.fit_transform(recon_loss_list)
-            # batch_score = np.mean(recon_loss_list)
-            #
-            # if (batch_score < eta_l) or (batch_score > eta_h):
-            #     print("异常!")
-            # else:
-            #     print("正常")
 
-            scores = recon_loss_list
-            recon_loss_list = []
+    for i in range(int(len(all_labels)/pack_size)):
+        # Calculate the anomaly score
+        # Apply PCA to reduce the dimensionality
+        scores = recon_loss_list[i * pack_size:(i + 1) * pack_size]
+        pca = PCA(n_components=1)
+        scores = pca.fit_transform(scores)
 
-            # Compare the scores with η to determine anomalies
-            y_batch = []
-            for lab, score in zip(lable, scores):
-                anomalies = (score < eta_l) or (score > eta_h)
-                if anomalies:
-                    a = 0
-                    # print("异常!")
-                else:
-                    a = 1
-                    # print("正常")
-                y.append(a)
-                y_batch.append(a)
 
-                a_tensor = torch.tensor(a)
-                # lable_tensor = torch.tensor(lable)
-
-                correct += (a_tensor.float() == lab.float()).sum().item()
-            y_batch = sum(y_batch)
-            if y_batch / batch_size >= 0.9 :
-                print("正常")
+        # Compare the scores with η to determine anomalies
+        y_batch = []
+        for lab, score in zip(all_labels[i * pack_size:(i + 1) * pack_size], scores):
+            anomalies = (score < eta_l) or (score > eta_h)
+            if anomalies:
+                a = 0
+                # print("异常!")
             else:
-                print("异常！")
+                a = 1
+                # print("正常")
+            y.append(a)
+            y_batch.append(a)
+
+            a_tensor = torch.tensor(a)
+            lab_tensor = torch.tensor(lab)
+
+            correct += (a_tensor.float() == lab_tensor.float()).sum().item()
+        y_batchs = sum(y_batch)
+        if y_batchs / pack_size >= 0.9 :
+            print("正常")
+        else:
+            print("异常！")
 
 
 
